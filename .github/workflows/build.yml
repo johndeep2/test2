@@ -25,18 +25,32 @@ jobs:
       - name: Build APK
         run: |
           flutter create --org com.gpstracker --project-name gps_tracker tmp_app
-          
-          # Copy code
           cp -r lib/* tmp_app/lib/
           cp pubspec.yaml tmp_app/pubspec.yaml
           cp android/app/src/main/AndroidManifest.xml tmp_app/android/app/src/main/AndroidManifest.xml
-          
+
+          # Ghi đè toàn bộ android/build.gradle với Kotlin 1.9.0
+          cat > tmp_app/android/build.gradle << 'EOF'
+          buildscript {
+              ext.kotlin_version = '1.9.0'
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:8.1.4'
+                  classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+              }
+          }
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          EOF
+
           cd tmp_app
-          
-          # Fix Kotlin version
-          sed -i "s/ext.kotlin_version = '1.7.10'/ext.kotlin_version = '1.9.0'/" android/build.gradle
-          sed -i "s/kotlin_version = '1.7.10'/kotlin_version = '1.9.0'/" android/build.gradle
-          
           flutter pub get
           flutter build apk --release --no-tree-shake-icons
 
