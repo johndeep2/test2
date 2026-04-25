@@ -19,7 +19,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0'
+          flutter-version: '3.13.9'
           channel: 'stable'
 
       - name: Build APK
@@ -27,29 +27,8 @@ jobs:
           flutter create --org com.gpstracker --project-name gps_tracker tmp_app
           cp -r lib/* tmp_app/lib/
           cp pubspec.yaml tmp_app/pubspec.yaml
-          cp android/app/src/main/AndroidManifest.xml tmp_app/android/app/src/main/AndroidManifest.xml
-
-          # Ghi đè toàn bộ android/build.gradle với Kotlin 1.9.0
-          cat > tmp_app/android/build.gradle << 'EOF'
-          buildscript {
-              ext.kotlin_version = '1.9.0'
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:8.1.4'
-                  classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-              }
-          }
-          allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
-          EOF
-
+          cp android/app/src/main/AndroidManifest.xml \
+             tmp_app/android/app/src/main/AndroidManifest.xml
           cd tmp_app
           flutter pub get
           flutter build apk --release --no-tree-shake-icons
